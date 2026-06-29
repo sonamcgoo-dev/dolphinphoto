@@ -1,0 +1,31 @@
+# ── Python ───────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+*.egg
+*.db
+
+# ── Node ─────────────────────────────────────────────
+node_modules/
+frontend/dist/
+
+# ── Environment ──────────────────────────────────────
+.env
+.env.local
+
+# ── IDE / OS ─────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Project-specific ─────────────────────────────────
+# User workspace (recreated during setup)
+workspace/
+
+# Built plugin artifacts
+plugins/*/__pycache__/
