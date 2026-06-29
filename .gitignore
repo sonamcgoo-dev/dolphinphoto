@@ -1,18 +1,50 @@
 # ── Python ───────────────────────────────────────────
 __pycache__/
 *.py[cod]
-*.egg-info/
-dist/
+*$py.class
+*.so
+.Python
 *.egg
+*.egg-info/
+*.whl
+.venv/
+venv/
+ENV/
+env/
+
+# Backend
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/*/__pycache__/
 *.db
+*.sqlite
+*.sqlite3
+dolphinphoto.db
 
 # ── Node ─────────────────────────────────────────────
 node_modules/
+frontend/node_modules/
 frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.local
+*.local
+
+# Electron
+frontend/release/
+frontend/dist-electron/
+
+# Build outputs
+*.exe
+*.dll
+*.so
+*.dylib
+*.spec
 
 # ── Environment ──────────────────────────────────────
 .env
 .env.local
+.env.*.local
 
 # ── IDE / OS ─────────────────────────────────────────
 .vscode/
@@ -22,10 +54,39 @@ frontend/dist/
 *~
 .DS_Store
 Thumbs.db
+Desktop.ini
 
-# ── Project-specific ─────────────────────────────────
-# User workspace (recreated during setup)
+# ── Logs ─────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── AI Models (Large Files) ──────────────────────────
+models/
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.bin
+
+# ── Project Outputs ──────────────────────────────────
+outputs/
+temp/
+tmp/
 workspace/
 
-# Built plugin artifacts
+# ── Test Coverage ────────────────────────────────────
+.coverage
+htmlcov/
+.pytest_cache/
+
+# ── Jupyter ─────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Build Artifacts ──────────────────────────────────
+build/DolphinPhotoBackend/
 plugins/*/__pycache__/
+

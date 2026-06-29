@@ -1,232 +1,201 @@
-# 🐬 DolphinPhoto
+# 🐬 DolphinPhoto AI Studio
 
-Local AI photo & video editing application by Black Tiger Computing.
+## The Ultimate AI Creative Studio
 
-## Features
+> **Photoshop meets AI Magic** — A comprehensive creative suite for photo/video editing with AI-powered tools, filters, and real-time processing.
 
-- **AI-Powered Editing**: Stable Diffusion (txt2img, img2img, inpainting), background removal, upscaling, denoising, sharpening
-- **Video Generation**: Create videos from images with transitions and effects
-- **Dream Video**: AI-powered video generation from image sequences with face detection
-- **Glowup**: AI creative enhancement with face restoration
-- **Model Management**: Browse and download models from CivitAI with hardware-specific recommendations
-- **LoRA Support**: Load, manage, and apply LoRA adapters to customize AI outputs
-- **Workflow System**: Create, save, and execute custom image processing pipelines
-- **File Conversion**: Convert between PNG, JPEG, WebP, BMP, and TIFF formats
-- **MCP Server**: Model Context Protocol for agent/IDE integration
-- **Hardware-Aware**: Automatic GPU detection and optimization (CUDA, MPS, CPU)
-- **Local-First**: All processing happens on your machine - no cloud required
-- **Cross-Platform**: Windows, macOS, and Linux support via Electron
+![Version](https://img.shields.io/badge/version-1.0.0-00d4ff?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-7b2dff?style=for-the-badge)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-00ff88?style=for-the-badge)
 
-## Tech Stack
+---
+
+## ✨ Features
+
+### 🎨 Photo Tools
+- **AI Generation**: Text-to-image, image-to-image, inpainting with Stable Diffusion
+- **Smart Editing**: Crop, resize, rotate, brightness, contrast, saturation controls
+- **Background Removal**: One-click AI-powered background removal
+- **Upscaling**: 2x, 4x AI upscaling with Real-ESRGAN
+- **Face Restoration**: GFPGAN-powered face enhancement
+
+### 🎬 Video Tools
+- **Dream Video**: Transform images into mesmerizing AI-powered videos
+- **Video Slideshows**: Create videos from image collections with transitions
+- **Video Enhancement**: Upscale, denoise, and stabilize videos
+- **Trim & Edit**: Frame-accurate video cutting and speed control
+
+### 🌈 Filters (60+)
+
+**Social Filters (Snapchat-style)**
+- 🐶🐱🐰 Face filters (puppy ears, cat ears, bunny ears)
+- 🤓🕶️ Glasses (nerd, sunglasses)
+- 😇👑👼 Accessories (halo, crown, flower crown)
+- 😊💄✨ Beauty (blush, lipstick, eyeshadow, smooth skin)
+
+**Artistic Filters**
+- 🎞️ Vintage Film, 🎬 Cinematic, ✏️ Sketch, 🖼️ Oil Painting
+- 🌈 Neon Glow, 💖 Pink, 💙 Blue, 💜 Purple
+- 🎨 Watercolor, 📚 Comic Book, ✨ Holographic
+
+**Color Grading**
+- 🟠💧 Teal & Orange, 🌅 Golden Hour, ❄️ Cool Blue
+- Duotones, Color Splash, Color Pop
+
+**Glitch Effects**
+- 💠 Glitch, 📺 Scanlines, 📡 Static, 🌈 RGB Shift
+
+### 🤖 AI Tools (MCP Integration)
+- **Model Context Protocol**: Connect AI agents and tools
+- **Tool Registry**: 20+ built-in AI tools
+- **Plugin System**: Extend functionality with custom plugins
+
+### 📦 Model Management
+- **CivitAI Integration**: Browse and download models
+- **HuggingFace Support**: Access gated models
+- **Local Models**: Checkpoint, LoRA, VAE, embeddings
+
+---
+
+## 🏗️ Tech Stack
 
 ### Backend
-- **FastAPI**: Modern async web framework
-- **PyTorch**: AI/ML framework with CPU/GPU support
-- **Diffusers**: Stable Diffusion models
-- **OpenCV**: Image processing
-- **SQLite**: Local database for settings and jobs
+```
+FastAPI          — Async web framework
+PyTorch          — AI/ML with CUDA/MPS/CPU support
+Diffusers        — Stable Diffusion pipelines
+OpenCV           — Computer vision & video processing
+SQLAlchemy       — Async database ORM
+RemBG            — Background removal
+Real-ESRGAN      — Image upscaling
+```
 
 ### Frontend
-- **React 18**: UI framework
-- **TypeScript**: Type safety
-- **Vite**: Fast build tool
-- **TailwindCSS**: Styling
-- **Radix UI**: Component library
-- **Electron**: Desktop application wrapper
-
-## Prerequisites
-
-- **Python 3.12+**: For the backend
-- **Node.js 22+**: For the frontend
-- **5+ GB free disk space**: For Python dependencies and AI models
-
-## Installation
-
-### 1. Clone the repository
-```bash
-git clone <repository-url>
-cd dolphinphoto
+```
+React 18         — UI framework
+TypeScript       — Type safety
+Vite             — Build tool
+TailwindCSS      — Styling
+Radix UI         — Accessible components
+Framer Motion    — Animations
+Zustand          — State management
 ```
 
-### 2. Backend Setup
+### Desktop
+```
+Electron         — Cross-platform desktop app
+```
 
+---
+
+## 📥 Installation
+
+### Prerequisites
+- **Python 3.12+** — Backend runtime
+- **Node.js 22+** — Frontend development
+- **5+ GB free disk** — Dependencies and models
+
+### Quick Start
+
+#### Windows
+```powershell
+.\start.bat
+```
+
+#### macOS/Linux
 ```bash
+chmod +x start.sh
+./start.sh
+```
+
+#### Manual Start
+```bash
+# Backend
 cd backend
 pip install -r requirements.txt
-```
+python main.py
 
-### 3. Frontend Setup
-
-```bash
+# Frontend (new terminal)
 cd frontend
 npm install
-cp .env.example .env
-```
-
-### 4. Run the Application
-
-#### Development Mode (PowerShell on Windows)
-```powershell
-.\dev.ps1
-```
-
-This will start:
-- Backend API server on `http://127.0.0.1:7777`
-- Frontend dev server on `http://localhost:5173`
-
-#### Manual Startup
-
-**Terminal 1 - Backend:**
-```bash
-cd backend
-python main.py
-```
-
-**Terminal 2 - Frontend:**
-```bash
-cd frontend
 npm run dev
 ```
 
-#### Electron Desktop App
-```bash
-cd frontend
-npm run electron:dev
-```
+---
 
-## First-Time Setup
+## 🚀 Usage
 
-1. Launch the application
-2. Complete the setup wizard:
-   - Choose a workspace directory (where models and outputs will be stored)
-   - Optionally add your CivitAI API key for model downloads
-3. Start editing!
+1. **Studio** - Main editing workspace
+2. **Dream Video** - AI video generation
+3. **Glowup** - AI photo enhancement
+4. **Filters** - Browse and apply 60+ filters
+5. **Models** - Manage AI models
+6. **MCP Hub** - Connect AI tools
+7. **Workspace** - Browse generated content
 
-## Usage
+---
 
-### Basic Workflow
-1. **Upload Images**: Drag and drop images into the editor
-2. **Select Tool**: Choose from the sidebar (Filters, Resize, AI tools, etc.)
-3. **Adjust Settings**: Use the tool panel to configure parameters
-4. **Process**: Click to apply the transformation
-5. **Download**: Save your results
-
-### Advanced Features
-
-#### Workflows
-Create reusable processing pipelines:
-- Combine multiple operations (filters, AI tools, transforms)
-- Save and load custom workflows
-- Use preset workflows for common tasks (Quick Enhance, Portrait Glowup, Vintage Photo, Social Media Ready)
-
-#### LoRA Management
-- Browse and download LoRA adapters from CivitAI
-- Load LoRAs into memory for use in txt2img/img2img
-- Apply multiple LoRAs with custom weights
-- Manage loaded LoRAs via the Models panel
-
-#### MCP Integration
-The DolphinPhoto MCP server allows AI agents and IDEs to integrate with the application:
-- Run the MCP server: `python -m app.mcp.server`
-- Provides tools for image generation, transformation, and processing
-- Exposes device information and model resources
-- Enables automation and batch processing workflows
-
-#### Hardware-Specific Recommendations
-During setup, DolphinPhoto analyzes your hardware and recommends:
-- Optimal models for your GPU/CPU configuration
-- Starter pack of essential models (checkpoint, upscaler, LoRA)
-- Performance expectations based on your hardware tier
-
-### AI Tools
-- **Txt2Img**: Generate images from text prompts
-- **Img2Img**: Transform images with AI
-- **Inpaint**: Edit specific regions of images
-- **Remove Background**: Automatic background removal
-- **Upscale**: Enhance image resolution with AI
-- **Glowup**: Creative AI enhancement
-
-### Video Tools
-- **Video Generator**: Create slideshows with transitions
-- **Dream Video**: AI-powered video generation
-
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 dolphinphoto/
 ├── backend/
 │   ├── app/
-│   │   ├── api/          # API endpoints
-│   │   ├── core/         # Configuration, database
-│   │   ├── models/       # Database models
-│   │   ├── services/     # Business logic (AI tools, etc.)
-│   │   └── plugins/      # Plugin system
-│   ├── main.py           # Application entry point
-│   └── requirements.txt  # Python dependencies
+│   │   ├── api/v1/          # API endpoints
+│   │   ├── core/           # Configuration
+│   │   ├── services/       # Business logic
+│   │   │   ├── ai_service.py      # Stable Diffusion
+│   │   │   ├── filter_service.py   # 60+ filters
+│   │   │   ├── video_service.py    # Video processing
+│   │   │   └── device_service.py   # Hardware detection
+│   │   ├── mcp/            # MCP server
+│   │   └── plugins/        # Plugin system
+│   └── main.py             # Entry point
+│
 ├── frontend/
 │   ├── src/
-│   │   ├── components/   # React components
-│   │   ├── pages/        # Page components
-│   │   ├── store/        # State management (Zustand)
-│   │   └── utils/        # Utilities, API client
-│   ├── electron/         # Electron main process
-│   └── package.json      # Node dependencies
-└── dev.ps1              # Development launcher
+│   │   ├── pages/          # Application pages
+│   │   ├── store/          # Zustand stores
+│   │   └── api/            # API client
+│   └── electron/           # Desktop app
+│
+├── start.bat               # Windows launcher
+├── start.sh               # Unix launcher
+└── README.md              # This file
 ```
 
-## Configuration
+---
 
-### Backend
-Configuration is managed via environment variables and database settings. See `backend/app/core/config.py` for options.
+## 💻 Hardware Support
 
-### Frontend
-Environment variables are set in `frontend/.env`:
-```
-VITE_API_URL=http://127.0.0.1:7777
-```
+| Hardware | Performance |
+|----------|-------------|
+| NVIDIA GPU (24GB+) | 🔥 Elite |
+| NVIDIA GPU (16GB) | ⚡ Premium |
+| NVIDIA GPU (8GB) | 💪 High |
+| Apple Silicon | 🍎 M1-M3 |
+| CPU Only | 💻 Fallback |
 
-## GPU Acceleration
+---
 
-The application automatically detects and uses available GPU acceleration:
-- **CUDA**: NVIDIA GPUs (install PyTorch with CUDA support)
-- **MPS**: Apple Silicon (M1/M2/M3) GPUs
-- **CPU**: Fallback for systems without GPU
+## 🤝 Contributing
 
-For optimal performance with NVIDIA GPUs:
-```bash
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-## Troubleshooting
+---
 
-### Backend won't start
-- Check Python version: `python --version` (requires 3.12+)
-- Verify dependencies: `pip install -r requirements.txt`
-- Check port 7777 is not in use
+## 📄 License
 
-### Frontend won't start
-- Check Node.js version: `node --version` (requires 22+)
-- Verify dependencies: `npm install`
-- Check backend is running on port 7777
+MIT License
 
-### Out of disk space
-The application requires ~5 GB for Python dependencies and additional space for AI models. Free up disk space before installation.
+---
 
-### AI models not downloading
-- Verify CivitAI API key is set in setup
-- Check internet connection
-- Ensure workspace directory has write permissions
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Credits
+## 🐬 Credits
 
 **Black Tiger Computing**
 Lead Developer: Sona McGoo
 
-Built with:
-- FastAPI, React, TypeScript, TailwindCSS
-- PyTorch, Diffusers, Transformers
-- Electron, Radix UI, Lucide Icons
+Built with FastAPI, React, PyTorch, Diffusers, and ❤️
