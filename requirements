@@ -1,0 +1,68 @@
+# DolphinPhoto Backend Dependencies
+# Works on CPU; auto-scales with CUDA / MPS / ROCm when available
+
+# --- Web framework ---
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+aiofiles>=23.2.1
+
+# --- Database ---
+sqlalchemy>=2.0.30
+aiosqlite>=0.20.0
+alembic>=1.13.1
+
+# --- Config & validation ---
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+pydantic[email]
+
+# --- Auth / security ---
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# --- Image processing (CPU-native, always available) ---
+pillow>=10.3.0
+opencv-python-headless>=4.9.0.80
+numpy>=1.26.4
+scipy>=1.13.0
+scikit-image>=0.23.2
+
+# --- AI / GPU (CPU fallback built-in) ---
+# NOTE: torch CPU is installed by default.
+# For CUDA: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+# For ROCm: pip install torch torchvision --index-url https://download.pytorch.org/whl/rocm5.7
+torch>=2.3.0
+torchvision>=0.18.0
+diffusers>=0.29.0
+transformers>=4.41.0
+accelerate>=0.30.0
+safetensors>=0.4.3
+huggingface-hub>=0.23.0
+
+# --- Background removal ---
+rembg>=2.0.57
+onnxruntime>=1.18.0   # CPU onnx; swap to onnxruntime-gpu for CUDA
+
+# --- Upscaling ---
+realesrgan>=0.3.0
+basicsr>=1.4.2
+
+# --- Video generation & editing ---
+moviepy>=1.0.3
+imageio>=2.34.1
+imageio-ffmpeg>=0.5.1
+
+# --- HTTP client (CivitAI API, model downloads) ---
+httpx>=0.27.0
+httpx[http2]
+
+# --- Hardware detection ---
+psutil>=5.9.8
+
+# --- Console / logging ---
+rich>=13.7.1
+loguru>=0.7.2
+
+# --- Task queue (in-process, no Redis needed) ---
+anyio>=4.3.0
