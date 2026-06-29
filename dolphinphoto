@@ -1,0 +1,150 @@
+from __future__ import annotations
+
+"""
+DolphinPhoto API Server
+Black Tiger Computing — Lead Dev: Sona McGoo
+
+Runs on http://127.0.0.1:7777
+"""
+
+from contextlib import asynccontextmanager
+
+import uvicorn
+from app.core.config import get_settings
+from app.core.database import init_db
+from app.plugins.manager import plugin_manager
+from app.services.device_service import device_service
+from app.services.job_manager import job_manager
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+
+console = Console()
+settings = get_settings()
+
+
+def _print_banner() -> None:
+    text = Text()
+    text.append("🐬 DolphinPhoto", style="bold cyan")
+    text.append(f" v{settings.VERSION}", style="bold white")
+    text.append(f"\n   {settings.COMPANY}", style="dim white")
+    text.append(f"\n   Lead Dev: {settings.LEAD_DEV}", style="dim white")
+    text.append(f"\n\n   Device : ", style="white")
+    text.append(settings.DEVICE.upper(), style="bold magenta")
+    text.append(f" ({device_service.info.device_name})", style="dim")
+    text.append(f"\n   RAM    : {device_service.info.ram_gb} GB", style="white")
+    if device_service.info.vram_gb:
+        text.append(f"\n   VRAM   : {device_service.info.vram_gb} GB", style="white")
+    text.append(
+        f"\n   Tier   : {device_service.info.performance_tier}", style="bold green"
+    )
+    text.append(
+        f"\n\n   API    : http://{settings.HOST}:{settings.PORT}/api/v1",
+        style="bold cyan",
+    )
+    console.print(
+        Panel(text, title="[bold cyan]🐬 DolphinPhoto[/bold cyan]", border_style="cyan")
+    )
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ── Startup ───────────────────────────────────────────────────────────────
+    _print_banner()
+    await init_db()
+    await job_manager.reset_stale_jobs()
+
+    # Load workspace settings from DB if setup was previously completed
+    from pathlib import Path
+
+    from app.core.database import AsyncSessionLocal
+    from app.models.db_models import Setting
+    from sqlalchemy import select
+
+    async with AsyncSessionLocal() as db:
+        rows = await db.execute(select(Setting))
+        cfg = {r.key: r.value for r in rows.scalars().all()}
+
+    if cfg.get("workspace_dir"):
+        settings.update_workspace(Path(cfg["workspace_dir"]))
+        settings.ensure_dirs()
+    if cfg.get("setup_complete") == "true":
+        settings.SETUP_COMPLETE = True
+    if cfg.get("civitai_api_key"):
+        settings.CIVITAI_API_KEY = cfg["civitai_api_key"]
+
+    # Load plugins
+    plugin_manager.discover_and_load(settings.PLUGINS_DIR)
+
+    yield
+
+    # ── Shutdown ──────────────────────────────────────────────────────────────
+    console.print("[cyan]DolphinPhoto shutting down...[/cyan]")
+    for plugin in plugin_manager.all():
+        plugin.on_unload()
+
+
+app = FastAPI(
+    title="DolphinPhoto API",
+    description="Local AI photo & video editing — Black Tiger Computing",
+    version=settings.VERSION,
+    lifespan=lifespan,
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+)
+
+# ── CORS — allow Electron renderer and local dev servers ─────────────────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # local-only server, safe to allow all
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ── Routers ───────────────────────────────────────────────────────────────────
+from app.api.v1 import dream_video as dream_video_router
+from app.api.v1 import images, jobs, setup, video
+from app.api.v1 import models as models_router
+
+app.include_router(setup.router, prefix=settings.API_V1_STR)
+app.include_router(images.router, prefix=settings.API_V1_STR)
+app.include_router(video.router, prefix=settings.API_V1_STR)
+app.include_router(jobs.router, prefix=settings.API_V1_STR)
+app.include_router(models_router.router, prefix=settings.API_V1_STR)
+app.include_router(dream_video_router.router, prefix=settings.API_V1_STR)
+
+
+# ── Root endpoints ────────────────────────────────────────────────────────────
+@app.get("/")
+async def root():
+    return {
+        "name": settings.APP_NAME,
+        "company": settings.COMPANY,
+        "version": settings.VERSION,
+        "status": "running",
+        "api": f"http://{settings.HOST}:{settings.PORT}{settings.API_V1_STR}",
+        "docs": f"http://{settings.HOST}:{settings.PORT}/api/docs",
+    }
+
+
+@app.get("/health")
+async def health():
+    return {
+        "status": "ok",
+        "device": device_service.info.model_dump(),
+        "setup_complete": settings.SETUP_COMPLETE,
+        "plugins_loaded": len(plugin_manager.all()),
+    }
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=False,
+        log_level="warning",  # rich handles our banner; keep uvicorn quiet
+    )
