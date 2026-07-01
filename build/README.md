@@ -66,7 +66,7 @@ Output: `frontend/release/DolphinPhoto AI Studio Setup 1.0.0.exe`
 The generated installer is a full NSIS wizard (`oneClick: false`) and now:
 - launches DolphinPhoto automatically when setup finishes
 - installs backend Python dependencies on first packaged launch
-- pre-pulls the default model (`stabilityai/stable-diffusion-2-1`) on first launch
+- pre-pulls the default model (`stabilityai/stable-diffusion-2-1`) in the background after startup
 - shows a branded animated DolphinPhoto splash while loading
 
 To skip first-launch model pre-pull during testing:

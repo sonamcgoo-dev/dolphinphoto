@@ -1,3 +1,6 @@
+import logoImage from '@/assets/dolphinphoto-logo.png'
+import appIcon from '@/assets/icon.png'
+
 interface BrandLogoProps {
   className?: string
   showWordmark?: boolean
@@ -7,7 +10,7 @@ export default function BrandLogo({ className = '', showWordmark = true }: Brand
   if (!showWordmark) {
     return (
       <img
-        src="/icon.png"
+        src={appIcon}
         alt="DolphinPhoto"
         className={`h-8 w-8 rounded-lg object-cover ${className}`.trim()}
       />
@@ -16,7 +19,7 @@ export default function BrandLogo({ className = '', showWordmark = true }: Brand
 
   return (
     <img
-      src="/dolphinphoto-logo.png"
+      src={logoImage}
       alt="DolphinPhoto"
       className={`h-8 w-auto object-contain ${className}`.trim()}
     />

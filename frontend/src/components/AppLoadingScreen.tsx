@@ -1,16 +1,18 @@
 import { motion } from 'framer-motion'
+import logoImage from '@/assets/dolphinphoto-logo.png'
+import dolphinLaughImage from '@/assets/dolphin-laugh.png'
 
 export default function AppLoadingScreen() {
   return (
     <div className="min-h-screen bg-space-900 flex items-center justify-center p-6">
       <div className="text-center">
         <img
-          src="/dolphinphoto-logo.png"
+          src={logoImage}
           alt="DolphinPhoto"
           className="h-16 w-auto mx-auto mb-5 object-contain"
         />
         <motion.img
-          src="/dolphin-laugh.png"
+          src={dolphinLaughImage}
           alt="Laughing dolphin loading"
           className="w-48 h-48 object-cover rounded-2xl shadow-lg shadow-accent-magenta/30 mx-auto"
           animate={{

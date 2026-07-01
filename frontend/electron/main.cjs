@@ -1,8 +1,8 @@
 const { app, BrowserWindow, ipcMain, Menu, Tray, dialog, shell } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const http = require("http");
 const { spawn } = require("child_process");
-const { pathToFileURL } = require("url");
 
 let mainWindow = null;
 let splashWindow = null;
@@ -25,9 +25,16 @@ function backendDirPath() {
     : path.join(process.resourcesPath, "backend");
 }
 
+function toDataUri(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  const mime = ext === ".png" ? "image/png" : ext === ".jpg" || ext === ".jpeg" ? "image/jpeg" : "application/octet-stream";
+  const base64 = fs.readFileSync(filePath).toString("base64");
+  return `data:${mime};base64,${base64}`;
+}
+
 function createSplashWindow() {
-  const dolphinUrl = pathToFileURL(publicAssetPath("dolphin-laugh.png")).href;
-  const logoUrl = pathToFileURL(publicAssetPath("dolphinphoto-logo.png")).href;
+  const dolphinUrl = toDataUri(publicAssetPath("dolphin-laugh.png"));
+  const logoUrl = toDataUri(publicAssetPath("dolphinphoto-logo.png"));
 
   const html = `<!doctype html>
 <html lang="en">
@@ -232,7 +239,7 @@ function createWindow() {
   Menu.setApplicationMenu(menu);
 }
 
-function waitForBackendReady(timeoutMs = 15 * 60 * 1000) {
+function waitForBackendReady(timeoutMs = 5 * 60 * 1000) {
   const deadline = Date.now() + timeoutMs;
 
   return new Promise((resolve, reject) => {
@@ -299,7 +306,6 @@ async function startBackend() {
   const bootstrapScript = path.join(backendDir, "bootstrap_runtime.py");
   const runtimeDir = path.join(app.getPath("userData"), "runtime");
   const workspaceDir = path.join(app.getPath("home"), ".dolphinphoto");
-  const pullDefaultModel = process.env.DOLPHINPHOTO_SKIP_MODEL_PULL !== "1";
 
   const commonArgs = [
     bootstrapScript,
@@ -311,9 +317,6 @@ async function startBackend() {
     workspaceDir,
     "--launch-backend",
   ];
-  if (pullDefaultModel) {
-    commonArgs.push("--pull-default-model");
-  }
 
   const candidates = process.platform === "win32"
     ? [
@@ -344,6 +347,52 @@ async function startBackend() {
   }
 
   throw lastError || new Error("Python runtime not found for backend bootstrap");
+}
+
+async function warmDefaultModelInBackground() {
+  if (process.env.DOLPHINPHOTO_SKIP_MODEL_PULL === "1") {
+    return;
+  }
+
+  const backendDir = backendDirPath();
+  const bootstrapScript = path.join(backendDir, "bootstrap_runtime.py");
+  const runtimeDir = path.join(app.getPath("userData"), "runtime");
+  const workspaceDir = path.join(app.getPath("home"), ".dolphinphoto");
+  const args = [
+    bootstrapScript,
+    "--backend-dir",
+    backendDir,
+    "--runtime-dir",
+    runtimeDir,
+    "--workspace",
+    workspaceDir,
+    "--pull-default-model",
+  ];
+
+  const candidates = process.platform === "win32"
+    ? [
+        { cmd: "py", prefix: ["-3"] },
+        { cmd: "python", prefix: [] },
+      ]
+    : [
+        { cmd: "python3", prefix: [] },
+        { cmd: "python", prefix: [] },
+      ];
+
+  for (const candidate of candidates) {
+    try {
+      const warmup = await spawnProcess(candidate.cmd, [...candidate.prefix, ...args], {
+        cwd: backendDir,
+        stdio: "pipe",
+      });
+      warmup.stdout.on("data", (data) => console.log(`Model Warmup: ${data}`));
+      warmup.stderr.on("data", (data) => console.error(`Model Warmup Error: ${data}`));
+      warmup.on("close", (code) => console.log(`Model warmup exited with code ${code}`));
+      return;
+    } catch (_error) {
+      // Try next candidate.
+    }
+  }
 }
 
 async function openFile(type) {
@@ -398,28 +447,27 @@ ipcMain.handle("select-directory", async () => {
 ipcMain.handle("show-save-dialog", async (_event, options) => dialog.showSaveDialog(mainWindow, options));
 ipcMain.handle("get-app-path", () => app.getPath("userData"));
 
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   createSplashWindow();
-  let backendError = null;
-  try {
-    await startBackend();
-  } catch (error) {
-    backendError = error;
-  }
-
   createWindow();
   if (!isDev) {
     createTray();
   }
 
-  if (backendError) {
-    dialog.showMessageBox({
-      type: "warning",
-      title: "Backend Startup Warning",
-      message: "DolphinPhoto launched, but backend setup did not fully complete.",
-      detail: String(backendError),
+  startBackend()
+    .then(() => {
+      warmDefaultModelInBackground().catch(() => {
+        // Model warmup is best-effort and should not block launch.
+      });
+    })
+    .catch((backendError) => {
+      dialog.showMessageBox({
+        type: "warning",
+        title: "Backend Startup Warning",
+        message: "DolphinPhoto launched, but backend setup did not fully complete.",
+        detail: String(backendError),
+      });
     });
-  }
 });
 
 app.on("window-all-closed", () => {

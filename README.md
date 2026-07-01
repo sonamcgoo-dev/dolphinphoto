@@ -110,7 +110,7 @@ npm run electron:build:win
 ```
 Installer output: `frontend\release\DolphinPhoto AI Studio Setup 1.0.0.exe`
 
-On first launch from the installer build, the app bootstraps backend dependencies and pre-pulls the default model before opening the studio UI. To skip model pre-pull for testing, set `DOLPHINPHOTO_SKIP_MODEL_PULL=1`.
+On first launch from the installer build, the app bootstraps backend dependencies, then starts the studio and pre-pulls the default model in the background. To skip model pre-pull for testing, set `DOLPHINPHOTO_SKIP_MODEL_PULL=1`.
 
 #### macOS/Linux
 ```bash
