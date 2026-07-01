@@ -111,7 +111,9 @@ def main() -> None:
     runtime_dir = Path(args.runtime_dir).resolve()
     workspace = Path(args.workspace).resolve()
 
-    requirements = backend_dir / "requirements.txt"
+    requirements = backend_dir / "requirements-runtime.txt"
+    if not requirements.exists():
+        requirements = backend_dir / "requirements.txt"
     if not requirements.exists():
         raise FileNotFoundError(f"Backend requirements not found: {requirements}")
 
