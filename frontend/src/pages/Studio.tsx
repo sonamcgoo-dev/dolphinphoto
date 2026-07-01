@@ -8,6 +8,7 @@ import {
   FileJson2,
   FileOutput,
   FlipHorizontal,
+  FolderOpen,
   GitBranch,
   Loader2,
   RotateCw,
@@ -160,6 +161,7 @@ export default function Studio() {
   const [importedNodes, setImportedNodes] = useState<ImportedNode[]>([])
   const [selectedImportedNodes, setSelectedImportedNodes] = useState<string[]>([])
   const [selectedExtensions, setSelectedExtensions] = useState<string[]>([])
+  const [downloadBusy, setDownloadBusy] = useState(false)
   const [metrics, setMetrics] = useState<PipelineMetric[]>([
     { label: 'Load', ms: 180 },
     { label: 'Prep', ms: 210 },
@@ -222,10 +224,11 @@ export default function Studio() {
     [setCurrentImage],
   )
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] },
     maxFiles: 1,
+    noClick: true,
   })
 
   const loadImageElement = (src: string) =>
@@ -315,6 +318,7 @@ export default function Studio() {
   const convertAndDownload = async () => {
     if (!currentImage) return
     const started = performance.now()
+    setDownloadBusy(true)
     try {
       const img = await loadImageElement(currentImage)
       const canvas = document.createElement('canvas')
@@ -334,16 +338,20 @@ export default function Studio() {
       toast.success(`Converted to ${converterFormat.toUpperCase()}`)
     } catch {
       toast.error('File conversion failed')
+    } finally {
+      setDownloadBusy(false)
     }
   }
 
   const downloadCurrent = () => {
     if (!currentImage) return
+    setDownloadBusy(true)
     const link = document.createElement('a')
     link.href = currentImage
     link.download = `dolphinphoto-${Date.now()}.png`
     link.click()
     pushMetric('Output', 80 + Math.random() * 80)
+    setTimeout(() => setDownloadBusy(false), 550)
   }
 
   const undo = () => {
@@ -545,15 +553,19 @@ export default function Studio() {
   }
 
   return (
-    <div className="h-full p-4 bg-space-900 overflow-hidden">
-      <div className="h-full grid grid-cols-1 xl:grid-cols-[1.2fr_1.2fr_0.95fr] gap-4">
-        <section className="card p-4 flex flex-col overflow-hidden">
+    <div className="h-full p-4 bg-space-900 overflow-y-auto xl:overflow-hidden">
+      <div className="h-auto xl:h-full grid grid-cols-1 xl:grid-cols-[1.2fr_1.2fr_0.95fr] gap-4">
+        <section className="card p-4 flex flex-col min-h-[520px] xl:min-h-0 overflow-hidden">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <Wand2 size={18} className="text-accent-cyan" />
               Manual + AI Tools
             </h2>
             <div className="flex items-center gap-2">
+              <button className="btn-secondary py-1.5 px-3 flex items-center gap-2" onClick={open}>
+                <FolderOpen size={14} />
+                Open
+              </button>
               <button className="btn-secondary py-1.5 px-3" onClick={undo} disabled={historyIndex <= 0}>
                 Undo
               </button>
@@ -635,17 +647,28 @@ export default function Studio() {
           </div>
 
           <div className="mt-3 flex items-center gap-2">
-            <button className="btn-primary flex items-center gap-2" onClick={downloadCurrent} disabled={!currentImage}>
-              <Download size={16} />
+            <button className="btn-primary flex items-center gap-2" onClick={downloadCurrent} disabled={!currentImage || downloadBusy}>
+              {downloadBusy ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
               Download
             </button>
             <button className="btn-secondary" onClick={clearCanvas} disabled={!currentImage}>
               Clear
             </button>
           </div>
+          {(processing || downloadBusy) && (
+            <div className="mt-2">
+              <div className="h-2 rounded bg-space-700 overflow-hidden">
+                <div
+                  className="h-2 bg-gradient-to-r from-accent-cyan to-accent-purple animate-pulse"
+                  style={{ width: processing ? '70%' : '100%' }}
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1">{processing ? 'Processing…' : 'Preparing download…'}</p>
+            </div>
+          )}
         </section>
 
-        <section className="card p-4 flex flex-col overflow-hidden">
+        <section className="card p-4 flex flex-col min-h-[520px] xl:min-h-0 overflow-hidden">
           <h2 className="text-lg font-bold flex items-center gap-2 mb-3">
             <GitBranch size={18} className="text-accent-purple" />
             Pipeline Graph
@@ -733,7 +756,7 @@ export default function Studio() {
           </div>
         </section>
 
-        <section className="card p-4 overflow-y-auto">
+        <section className="card p-4 min-h-[520px] xl:min-h-0 overflow-y-auto">
           <h2 className="text-lg font-bold flex items-center gap-2 mb-3">
             <Boxes size={18} className="text-accent-magenta" />
             Modular Workflow Widgets
