@@ -65,6 +65,8 @@ yarn-error.log*
 
 # ── AI Models (Large Files) ──────────────────────────
 models/
+!backend/app/models/
+!backend/app/models/*.py
 *.safetensors
 *.ckpt
 *.pt
@@ -89,4 +91,3 @@ htmlcov/
 # ── Build Artifacts ──────────────────────────────────
 build/DolphinPhotoBackend/
 plugins/*/__pycache__/
-

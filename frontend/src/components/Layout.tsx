@@ -7,6 +7,7 @@ import {
 import clsx from 'clsx'
 import { api } from '@/api/client'
 import { useAppStore } from '@/store/useAppStore'
+import BrandLogo from '@/components/BrandLogo'
 
 const navItems = [
   { path: '/studio', icon: Sparkles, label: 'Studio' },
@@ -51,14 +52,9 @@ export default function Layout() {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-space-600">
-          {!collapsed && (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center">
-                <span className="text-lg">🐬</span>
-              </div>
-              <span className="font-heading font-bold text-white">DolphinPhoto</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2 min-w-0">
+            <BrandLogo className="h-8" showWordmark={!collapsed} />
+          </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="p-1.5 rounded-lg hover:bg-space-700 text-gray-400 hover:text-white transition-colors"
@@ -116,10 +112,7 @@ export default function Layout() {
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center">
-            <span className="text-lg">🐬</span>
-          </div>
-          <span className="font-heading font-bold">DolphinPhoto</span>
+          <BrandLogo className="h-8" />
         </div>
         <div className={clsx(
           'flex items-center gap-1 text-xs px-2 py-1 rounded-full',

@@ -4,14 +4,12 @@ AI model management endpoints
 """
 from __future__ import annotations
 
-import uuid
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app.core.config import get_settings
-from app.models.db_models import ModelType
 from app.services.ai_service import ai_service
 
 router = APIRouter(prefix="/models", tags=["models"])
@@ -45,9 +43,10 @@ async def list_models() -> dict:
     models = []
     
     # Checkpoint models
-    checkpoints = models_dir.glob("*.safetensors")
-    checkpoints |= models_dir.glob("*.ckpt")
-    checkpoints |= models_dir.glob("*.pth")
+    checkpoint_exts = ("*.safetensors", "*.ckpt", "*.pth")
+    checkpoints: list[Path] = []
+    for ext in checkpoint_exts:
+        checkpoints.extend(models_dir.glob(ext))
     
     for model_path in checkpoints:
         models.append({

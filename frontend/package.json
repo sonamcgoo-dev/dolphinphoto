@@ -3,15 +3,16 @@
   "version": "1.0.0",
   "description": "DolphinPhoto AI Studio - The Ultimate AI Creative Studio",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron:build": "npm run build && electron-builder",
-    "electron:build:win": "npm run build && electron-builder --win",
-    "electron:build:mac": "npm run build && electron-builder --mac",
-    "electron:build:linux": "npm run build && electron-builder --linux"
+    "electron:build": "npm run build && electron-builder --publish never",
+    "electron:build:win": "npm run build && electron-builder --win --publish never",
+    "electron:build:mac": "npm run build && electron-builder --mac --publish never",
+    "electron:build:linux": "npm run build && electron-builder --linux --publish never"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
@@ -59,9 +60,38 @@
     "directories": {
       "output": "release"
     },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://downloads.dolphinphoto.ai"
+      }
+    ],
     "files": [
       "dist/**/*",
       "electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": [
+          "**/*",
+          "!**/__pycache__/**",
+          "!**/*.pyc",
+          "!**/.pytest_cache/**"
+        ]
+      },
+      {
+        "from": "public",
+        "to": "public",
+        "filter": [
+          "icon.png",
+          "icon.ico",
+          "dolphinphoto-logo.png",
+          "dolphin-laugh.png",
+          "installer-sidebar.bmp"
+        ]
+      }
     ],
     "win": {
       "target": [
@@ -86,7 +116,13 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico",
+      "installerHeaderIcon": "public/icon.ico",
+      "installerSidebar": "public/installer-sidebar.bmp",
+      "uninstallerSidebar": "public/installer-sidebar.bmp"
     }
   }
 }

@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Folder, Key, Cpu, Check, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import axios from 'axios'
 import { api } from '@/api/client'
 import { motion } from 'framer-motion'
+import BrandLogo from '@/components/BrandLogo'
 
 export default function Setup() {
   const navigate = useNavigate()
@@ -30,10 +32,11 @@ export default function Setup() {
         toast.success('Setup complete!')
         navigate('/studio')
       }
-    } catch {
-      // Simulate success for demo
-      toast.success('Setup complete!')
-      navigate('/studio')
+    } catch (error) {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.detail ?? 'Setup failed. Please check your values and try again.')
+        : (error instanceof Error ? error.message : 'Setup failed. Please check your values and try again.')
+      toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -48,9 +51,7 @@ export default function Setup() {
       >
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center mx-auto mb-4">
-            <span className="text-4xl">🐬</span>
-          </div>
+          <BrandLogo className="h-16 mx-auto mb-4" />
           <h1 className="text-3xl font-heading font-bold">DolphinPhoto AI Studio</h1>
           <p className="text-gray-400 mt-2">The Ultimate AI Creative Studio</p>
         </div>
